@@ -3,13 +3,21 @@
   "version": "1.0.0",
   "description": "this is new teacher backend file.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "laksmi santo",
   "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.4"
+  },
   "dependencies": {
-    "nodemon": "^3.0.3"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.0"
   }
 }

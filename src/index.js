@@ -7,5 +7,5 @@ connectDB()
     })
   )
   .catch((error) => {
-    console.error("Server is throw error : ", error);
+    console.log("Server is throw error : ", error);
   });

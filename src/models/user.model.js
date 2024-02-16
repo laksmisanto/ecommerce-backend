@@ -37,7 +37,7 @@ const userSchema = new Schema(
       type: String,
       require: true,
     },
-    divition: {
+    division: {
       type: String,
       require: true,
     },
@@ -88,3 +88,5 @@ userSchema.methods.generateRefrashToken = async function () {
     { expiresIn: process.env.REFRASH_TOKEN_EXPIRY }
   );
 };
+
+export const User = mongoose.model("User", userSchema);

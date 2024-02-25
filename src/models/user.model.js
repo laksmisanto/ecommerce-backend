@@ -57,7 +57,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.password("password")) return next();
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
@@ -79,13 +79,13 @@ userSchema.methods.generateAccessToken = async function () {
   );
 };
 
-userSchema.methods.generateRefrashToken = async function () {
+userSchema.methods.generateRefreshToken = async function () {
   await jwt.sign(
     {
       _id: this._id,
     },
-    process.env.REFRASH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRASH_TOKEN_EXPIRY }
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
   );
 };
 

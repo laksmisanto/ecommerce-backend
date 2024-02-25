@@ -1,4 +1,16 @@
+import cookieParser from "cookie-parser";
 import { User } from "../models/user.model.js";
+
+const generateAccessTokenAndRefreshToken = async (userId) => {
+  const user = await User.findById(userId);
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  user.refreshToken = refreshToken;
+  await user.save();
+
+  return { accessToken, refreshToken };
+};
 const userRegister = async (req, res) => {
   let error = {};
   const {
@@ -56,8 +68,6 @@ const userRegister = async (req, res) => {
     password,
   });
 
-  console.log(createUser);
-
   if (!createUser) {
     error.message = "something went wrong";
     res.status(400).send(error);
@@ -92,6 +102,49 @@ const userLogin = async (req, res) => {
     error.message = "wrong auth credential";
     res.status(400).send(error);
   }
+  const { accessToken, refreshToken } = generateAccessTokenAndRefreshToken(
+    user._id
+  );
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
+  res
+    .status(200)
+    .cookies("accessToken", accessToken, option)
+    .cookies("refreshToken", refreshToken, option)
+    .json({
+      message: "user login successfully",
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    });
 };
 
-export { userRegister };
+const userLogout = async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshToken: null,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
+  res
+    .status(200)
+    .cookies("accessToken", option)
+    .cookies("refreshToken", option)
+    .json({
+      message: "user logout successfully",
+    });
+};
+
+export { userRegister, userLogin, userLogout };

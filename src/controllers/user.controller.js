@@ -52,33 +52,34 @@ const userRegister = async (req, res) => {
   if (exitingUser) {
     error.message = "already have a account";
     res.status(400).send(error);
-  }
+  } else {
+    const createUser = await User.create({
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      addressOne,
+      addressTwo,
+      city,
+      postCode,
+      division,
+      district,
+      password,
+    });
 
-  const createUser = await User.create({
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    addressOne,
-    addressTwo,
-    city,
-    postCode,
-    division,
-    district,
-    password,
-  });
-
-  if (!createUser) {
-    error.message = "something went wrong";
-    res.status(400).send(error);
+    if (!createUser) {
+      error.message = "something went wrong";
+      res.status(400).send(error);
+    }
+    const finalUserData = await User.findById(createUser._id).select(
+      "-password -refreshToken"
+    );
+    console.log(finalUserData);
+    res.status(200).json({
+      message: "user create successful",
+      data: finalUserData,
+    });
   }
-  const finalUserData = await User.findById(createUser._id).select(
-    "-password -refreshToken"
-  );
-  res.status(200).json({
-    message: "user create successful",
-    data: finalUserData,
-  });
 };
 
 const userLogin = async (req, res) => {

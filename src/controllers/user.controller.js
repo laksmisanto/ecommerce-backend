@@ -11,6 +11,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
 
   return { accessToken, refreshToken };
 };
+
 const userRegister = async (req, res) => {
   let error = {};
   const {
@@ -26,6 +27,7 @@ const userRegister = async (req, res) => {
     district,
     password,
     refreshToken,
+    role,
   } = req.body;
 
   if (
@@ -53,6 +55,10 @@ const userRegister = async (req, res) => {
     error.message = "already have a account";
     res.status(400).send(error);
   } else {
+    let roleValue = value;
+    if (!roleValue) {
+      roleValue = "customer";
+    }
     const createUser = await User.create({
       firstName,
       lastName,
@@ -65,6 +71,7 @@ const userRegister = async (req, res) => {
       division,
       district,
       password,
+      role: roleValue,
     });
 
     if (!createUser) {
@@ -148,4 +155,93 @@ const userLogout = async (req, res) => {
     });
 };
 
-export { userRegister, userLogin, userLogout };
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    (error.message = "All field are required"), res.status(400).send(error);
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        password: newPassword,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  await user.save({ validateBeforeSave: false });
+  res.status(200).json({
+    message: "password updated successfully",
+  });
+};
+
+const updateProfile = async (req, res) => {
+  let error = {};
+  const {
+    firstName,
+    lastName,
+    phoneNumber,
+    addressOne,
+    addressTwo,
+    city,
+    postCode,
+    division,
+    district,
+    refreshToken,
+    role,
+  } = req.body;
+
+  if (
+    [
+      firstName,
+      lastName,
+      phoneNumber,
+      addressOne,
+      addressTwo,
+      city,
+      postCode,
+      division,
+      district,
+    ].some((field) => field?.trim() === "")
+  ) {
+    error.message = "please fill all field";
+    res.status(401).send(error);
+  }
+  let roleValue = role;
+  if (!roleValue) {
+    roleValue = "customer";
+  }
+  const updateUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        firstName,
+        lastName,
+        phoneNumber,
+        addressOne,
+        addressTwo,
+        city,
+        postCode,
+        division,
+        district,
+        refreshToken,
+        role: roleValue,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  updateUser
+    .save({ validateBeforeSave: false })
+    .select("-password -refreshToken");
+  res.status(200).json({
+    message: "user update successfully",
+    data: updateUser,
+  });
+};
+
+export { userRegister, userLogin, userLogout, changePassword, updateProfile };

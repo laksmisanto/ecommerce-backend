@@ -11,8 +11,10 @@ app.use(cors({ origin: process.env.CORS_ORIGIN }));
 
 //import user router
 import userRouter from "./routes/user.route.js";
+import categoryRouter from "./routes/category.route.js";
 
 //implement this userRouter
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/category", categoryRouter);
 
 export default app;

@@ -3,8 +3,8 @@ import { User } from "../models/user.model.js";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   const user = await User.findById(userId);
-  const accessToken = user.generateAccessToken();
-  const refreshToken = user.generateRefreshToken();
+  const accessToken = await user.generateAccessToken();
+  const refreshToken = await user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
   await user.save();
@@ -55,7 +55,7 @@ const userRegister = async (req, res) => {
     error.message = "already have a account";
     res.status(400).send(error);
   } else {
-    let roleValue = value;
+    let roleValue = role;
     if (!roleValue) {
       roleValue = "customer";
     }
@@ -119,8 +119,8 @@ const userLogin = async (req, res) => {
   };
   res
     .status(200)
-    .cookies("accessToken", accessToken, option)
-    .cookies("refreshToken", refreshToken, option)
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
     .json({
       message: "user login successfully",
       data: {

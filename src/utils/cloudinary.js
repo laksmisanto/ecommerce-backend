@@ -22,3 +22,4 @@ const cloudinaryServer = async (localpath) => {
     console.log("CLOUDINARY FILE UPLOAD ERROR : ", error);
   }
 };
+export default cloudinaryServer;

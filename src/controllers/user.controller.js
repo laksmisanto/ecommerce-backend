@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import { User } from "../models/user.model.js";
-
+import mailProvider from "../utils/mailProvider.js";
+import mailVerificationTemplate from "../utils/template/mailVerification.template.js";
 const generateAccessTokenAndRefreshToken = async (userId) => {
   const user = await User.findById(userId);
   const accessToken = await user.generateAccessToken();
@@ -81,6 +82,13 @@ const userRegister = async (req, res) => {
     const finalUserData = await User.findById(createUser._id).select(
       "-password -refreshToken"
     );
+    const mailRes = await mailProvider(
+      email,
+      "Oreby cls",
+      2204,
+      mailVerificationTemplate
+    );
+    console.log("mail response : ", mailRes);
     console.log(finalUserData);
     res.status(200).json({
       message: "user create successful",

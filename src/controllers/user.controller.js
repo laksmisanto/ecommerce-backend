@@ -2,6 +2,9 @@ import cookieParser from "cookie-parser";
 import { User } from "../models/user.model.js";
 import mailProvider from "../utils/mailProvider.js";
 import mailVerificationTemplate from "../utils/template/mailVerification.template.js";
+import randomNumber from "../utils/randomNumber.js";
+import { set } from "mongoose";
+
 const generateAccessTokenAndRefreshToken = async (userId) => {
   const user = await User.findById(userId);
   const accessToken = await user.generateAccessToken();
@@ -60,6 +63,7 @@ const userRegister = async (req, res) => {
     if (!roleValue) {
       roleValue = "customer";
     }
+    const otp = randomNumber(4);
     const createUser = await User.create({
       firstName,
       lastName,
@@ -72,6 +76,7 @@ const userRegister = async (req, res) => {
       division,
       district,
       password,
+      verifiedOtp: otp,
       role: roleValue,
     });
 
@@ -84,12 +89,21 @@ const userRegister = async (req, res) => {
     );
     const mailRes = await mailProvider(
       email,
-      "Oreby cls",
-      2204,
+      "Oreby ecommerce",
+      otp,
       mailVerificationTemplate
     );
+    setTimeout(async () => {
+      await User.findOneAndUpdate(
+        { email },
+        { $set: { verifiedOtp: "" } },
+        { new: true }
+      );
+      console.log("your OTP time is out");
+    }, 100000);
     console.log("mail response : ", mailRes);
     console.log(finalUserData);
+
     res.status(200).json({
       message: "user create successful",
       data: finalUserData,
@@ -252,4 +266,34 @@ const updateProfile = async (req, res) => {
   });
 };
 
-export { userRegister, userLogin, userLogout, changePassword, updateProfile };
+const emailVerification = async (req, res) => {
+  let error = {};
+  const { email, otp } = req.body;
+
+  const isValidUser = await User.findOne({ email });
+
+  if (!isValidUser) {
+    error.message = "invalid user";
+    res.status(400).send(error);
+  }
+
+  if (isValidUser.verifiedOtp == otp) {
+    const verifiedUser = await User.findOneAndUpdate(
+      { email },
+      { $set: { isVerified: true, verifiedOtp: "" } },
+      { new: true }
+    );
+    res.status(201).json({
+      data: verifiedUser,
+    });
+  }
+};
+
+export {
+  userRegister,
+  userLogin,
+  userLogout,
+  changePassword,
+  updateProfile,
+  emailVerification,
+};

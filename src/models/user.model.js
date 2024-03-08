@@ -58,6 +58,13 @@ const userSchema = new Schema(
       enum: ["admin", "editor", "customer"],
       default: "customer",
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verifiedOtp: {
+      type: String,
+    },
   },
   { timeStamps: true }
 );

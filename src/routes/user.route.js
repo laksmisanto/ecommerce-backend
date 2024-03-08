@@ -1,5 +1,7 @@
 import { Router } from "express";
 import {
+  changePassword,
+  emailVerification,
   userLogin,
   userLogout,
   userRegister,
@@ -11,5 +13,7 @@ const router = Router();
 router.route("/register").post(userRegister);
 router.route("/login").post(userLogin);
 router.route("/logout").post(verifyUser, userLogout);
+router.route("/change_password").post(verifyUser, changePassword);
+router.route("/verify").post(emailVerification);
 
 export default router;

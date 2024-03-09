@@ -4,16 +4,16 @@ const categorySchema = new Schema(
   {
     name: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
     },
     details: {
       type: String,
-      require: true,
+      required: true,
     },
     categoryImage: {
       type: String,
-      require: true,
+      required: true,
     },
     slug: {
       type: String,

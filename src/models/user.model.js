@@ -6,25 +6,25 @@ const userSchema = new Schema(
   {
     firstName: {
       type: String,
-      require: true,
+      required: true,
     },
     lastName: {
       type: String,
-      require: true,
+      required: true,
     },
     email: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
       index: true,
     },
     phoneNumber: {
       type: String,
-      require: true,
+      required: true,
     },
     addressOne: {
       type: String,
-      require: true,
+      required: true,
     },
     addressTwo: {
       type: String,
@@ -32,23 +32,23 @@ const userSchema = new Schema(
     },
     city: {
       type: String,
-      require: true,
+      required: true,
     },
     postCode: {
       type: String,
-      require: true,
+      required: true,
     },
     division: {
       type: String,
-      require: true,
+      required: true,
     },
     district: {
       type: String,
-      require: true,
+      required: true,
     },
     password: {
       type: String,
-      require: true,
+      required: true,
     },
     refreshToken: {
       type: String,

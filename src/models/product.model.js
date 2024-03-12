@@ -6,10 +6,16 @@ const productSchema = new Schema(
       type: String,
       required: true,
     },
-    productThumbnail: {
-      type: [String],
+    productFeaturedImage: {
+      type: String,
       required: true,
     },
+    productDetailedImages: [
+      {
+        type: [String],
+        required: true,
+      },
+    ],
     productDetails: {
       type: String,
       required: true,

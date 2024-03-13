@@ -1,4 +1,5 @@
 import { Category } from "../models/category.model.js";
+import { Product } from "../models/product.model.js";
 import cloudinaryServer from "../utils/cloudinary.js";
 
 const createProduct = async (req, res) => {
@@ -27,25 +28,45 @@ const createProduct = async (req, res) => {
     res.status(400).send(error);
   }
 
-  const { path: productFeaturedImage } = req.files.productFeaturedImage[0];
-  console.log("This is product featured image", productFeaturedImage);
+  const { path: productFeaturedImagePath } = req.files.productFeaturedImage[0];
+  const { url } = cloudinaryServer(productFeaturedImagePath);
 
-  // const { url } = await cloudinaryServer(path);
-  //   console.log(url);
-  //   if (!slug) {
-  //     slug: name;
-  //   }
-  //   const category = await Category.create({
-  //     name,
-  //     details,
-  //     categoryImage: url,
-  //     slug,
-  //     whoCreated: req.user?._id,
-  //   });
-  //   res.status(201).json({
-  //     message: "category created successfully",
-  //     data: category,
-  //   });
+  let urls = await Promise.all(
+    req.files.productDetailedImages?.map((img) => {
+      try {
+        return cloudinaryServer(img.path);
+      } catch (error) {
+        console.log("Error Uploading Image to Cloudinary", error);
+      }
+    })
+  );
+
+  let urlLink = [];
+
+  urls.map(({ url }) => {
+    urlLink.push(url);
+  });
+
+  console.log(urlLink);
+
+  if (!slug) {
+    let newSlug = productName.replaceAll("", "-");
+    slug: newSlug;
+  }
+  const product = await Product.create({
+    productName,
+    productFeaturedImage: url,
+    productDetailedImages: urlLink,
+    productDetails,
+    productCategory,
+    inventory,
+    slug,
+    whoCreated: req.user?._id,
+  });
+  res.status(201).json({
+    message: "product created successfully",
+    data: product,
+  });
 };
 
 export { createProduct };

@@ -6,10 +6,12 @@ const orderSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    inventory: {
-      type: Schema.Types.ObjectId,
-      ref: "Inventory",
-    },
+    inventory: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Inventory",
+      },
+    ],
   },
   { timestamps: true }
 );

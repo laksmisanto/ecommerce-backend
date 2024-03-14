@@ -38,4 +38,4 @@ const inventorySchema = new Schema(
   { timestamps: true }
 );
 
-export const Inventory = mongoose.model("Product", inventorySchema);
+export const Inventory = mongoose.model("Inventory", inventorySchema);

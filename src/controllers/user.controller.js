@@ -289,6 +289,11 @@ const emailVerification = async (req, res) => {
   }
 };
 
+const userList = async (req, res) => {
+  const userListData = await User.find();
+  res.send(userListData);
+};
+
 export {
   userRegister,
   userLogin,
@@ -296,4 +301,5 @@ export {
   changePassword,
   updateProfile,
   emailVerification,
+  userList,
 };

@@ -36,4 +36,9 @@ const createCategory = async (req, res) => {
   });
 };
 
-export { createCategory };
+const categoryLists = async (req, res) => {
+  const categoryList = await Category.find();
+  res.send(categoryList);
+};
+
+export { createCategory, categoryLists };

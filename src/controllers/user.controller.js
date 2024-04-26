@@ -1,9 +1,8 @@
-import cookieParser from "cookie-parser";
+"use Client";
 import { User } from "../models/user.model.js";
 import mailProvider from "../utils/mailProvider.js";
 import mailVerificationTemplate from "../utils/template/mailVerification.template.js";
 import randomNumber from "../utils/randomNumber.js";
-import { set } from "mongoose";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   const user = await User.findById(userId);
@@ -11,7 +10,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
   const refreshToken = await user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
-  await user.save();
+  await user.save({ validateBeforeSave: false });
 
   return { accessToken, refreshToken };
 };
@@ -113,34 +112,41 @@ const userRegister = async (req, res) => {
 
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log("user login email and password", email, password);
   const error = {};
 
   if ([email, password].some((field) => field?.trim() === "")) {
     error.message = "all field are required";
-    req.status(400).send(error);
+    res.status(400).send(error);
+    return;
   }
 
   const user = await User.findOne({ email });
+  console.log("login user : ", user);
   if (!user) {
-    error.message = "wrong auth credential";
+    error.message = "wrong auth credential email";
     res.status(400).send(error);
+    return;
   }
-  const passwordCheck = user.isPasswordCorrect(password);
+  const passwordCheck = await user.isPasswordCorrect(password);
+
+  console.log("user login password : ", passwordCheck);
 
   if (!passwordCheck) {
-    error.message = "wrong auth credential";
+    error.message = "wrong auth credential password";
     res.status(400).send(error);
+    return;
   }
-  const { accessToken, refreshToken } = generateAccessTokenAndRefreshToken(
-    user._id
-  );
+
+  const { accessToken, refreshToken } =
+    await generateAccessTokenAndRefreshToken(user._id);
   const option = {
     httpOnly: true,
     secure: true,
   };
+  console.log("accessToken", accessToken);
+  console.log("refreshToken", refreshToken);
   res
-    .status(200)
     .cookie("accessToken", accessToken, option)
     .cookie("refreshToken", refreshToken, option)
     .json({
@@ -148,6 +154,7 @@ const userLogin = async (req, res) => {
       data: {
         accessToken,
         refreshToken,
+        role: user.role,
       },
     });
 };

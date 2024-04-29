@@ -19,7 +19,7 @@ const createCategory = async (req, res) => {
     res.status(400).send(error);
   }
   const { url } = await cloudinaryServer(path);
-  console.log(url);
+
   if (!slug) {
     slug: name;
   }
